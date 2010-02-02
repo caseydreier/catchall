@@ -1,21 +1,17 @@
 require 'test_helper'
 
-class ApplicationController < ActionController::Base
-  
-end
-
-
 class DeliverToDeveloperTest < ActionMailer::TestCase
   
+
   test "that the email address is changed properly when delivery method is appended with 'to_developer'" do
+    # Use our 'to_developer' delivery method to catch outgoing email.
+    ActionMailer::Base.delivery_method = :test_to_developer
     
     DeliverToDeveloper.developer_emails = 'casey@casey.com'
 
     # Setup our test email
     prepare_test_email
   
-    # Append with "to_developer" to trigger the code #
-    ActionMailer::Base.delivery_method = :test_to_developer
     ActionMailer::Base.deliver(@expected)
 
     # Make sure something was sent #
@@ -29,11 +25,13 @@ class DeliverToDeveloperTest < ActionMailer::TestCase
   end
   
   test "that the developer_emails setting will accept an array of email addresses" do
+    # Use our 'to_developer' delivery method to catch outgoing email.
+    ActionMailer::Base.delivery_method = :test_to_developer
+    
     prepare_test_email
+    
     DeliverToDeveloper.developer_emails = %w(casey@casey.com huminahowwa@casey.com)
     
-    # Append with "to_developer" to trigger the code #
-    ActionMailer::Base.delivery_method = :test_to_developer
     ActionMailer::Base.deliver(@expected)
 
     # Make one email was sent #
@@ -45,6 +43,23 @@ class DeliverToDeveloperTest < ActionMailer::TestCase
     # Make sure the "from" field was unchanged #
     assert_equal 'test@test.com',ActionMailer::Base.deliveries.first.from.first
     
+  end
+  
+  test "that deliver to developer will wipe out any bcc or cc fields from the email" do
+    # Use our 'to_developer' delivery method to catch outgoing email.
+    ActionMailer::Base.delivery_method = :test_to_developer
+    
+    prepare_test_email
+    @expected.bcc = 'dangerous@aol.com'
+    @expected.cc  = %w(boss@aol.com vp@aol.com)
+    
+    DeliverToDeveloper.developer_emails = 'casey@casey.com'
+    
+    # "send" email
+    ActionMailer::Base.deliver(@expected)
+    
+    assert ActionMailer::Base.deliveries.first.cc.blank?
+    assert ActionMailer::Base.deliveries.first.bcc.blank?
   end
   
   def prepare_test_email
