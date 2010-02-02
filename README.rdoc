@@ -1,13 +1,25 @@
-DeliverToDeveloper
-==================
+=Deliver To Developer Plugin
 
-Introduction goes here.
+This plugin overwrites any "to", "cc", and "bcc" address lines in your outgoing email and replaces it with a user-specified input.  This makes it easy to prevent any accidental email delivery when working on a development instance of an application with the mail server information enabled.
 
+=Example
 
-Example
-=======
+In an initializer, add your emails that all outgoing mail will deliver to:
 
-Example goes here.
+  # in config/initializers/deliver_to_developer.rb
+  DeliverToDeveloper.developer_emails = %w(dev1@clientshop.com dev2@clientshop.com)
+ 
+Then, in your development environment, append your mail delivery type with "_to_developer":
 
+  # config/environments/development.rb
+  config.action_mailer.delivery_method = :smtp_to_developer # or :sendmail_to_developer, etc.
+  
+Now all outgoing emails in your development environment will be caught and redirected to the email addresses specified above, using your preferred delivery method (smtp or sendmail).  Note that this will also prevent any 'cc' or 'bcc' emails from being sent, too.
 
-Copyright (c) 2010 [name of plugin creator], released under the MIT license
+=Installation
+
+This is a plugin, you can install it by calling the following from your Rails directory:
+
+  script/plugin install git://github.com/daphonz/deliver_to_developer
+
+Copyright (c) 2010 Casey Dreier, released under the MIT license
