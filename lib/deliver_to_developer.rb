@@ -1,4 +1,6 @@
 class DeliverToDeveloper
+  VERSION = '0.1.0'.freeze
+  
   cattr_accessor :developer_emails
   
   module InstanceMethods
