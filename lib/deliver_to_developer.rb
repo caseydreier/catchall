@@ -24,6 +24,7 @@ class DeliverToDeveloper
    #   config.actionmailer.delivery_method = :smtp_to_developer
    def perform_delivery_to_developer(mail)
      begin
+       previous_delivery_method = ActionMailer::Base.delivery_method
        
        # Determine the intended delivery method.
        ActionMailer::Base.delivery_method = intended_delivery_method(ActionMailer::Base.delivery_method)
@@ -37,7 +38,7 @@ class DeliverToDeveloper
        ActionMailer::Base.deliver(mail)
      
        # Reset the delivery method to the original version
-       ActionMailer::Base.delivery_method = delivery_method
+       ActionMailer::Base.delivery_method = previous_delivery_method
      
      rescue Exception => e
        # if an exception occurs, record the specific error
